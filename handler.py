@@ -2,7 +2,10 @@ import json
 import tweepy
 import config
 import csv
+import os
 
+
+# Send twitter every 10 minutes
 
 def twitter(event, context):
     # Authenticate to Twitter
@@ -12,24 +15,40 @@ def twitter(event, context):
     # Create API object
     api = tweepy.API(auth)
 
-    messages = []
-    with open(config.MESSAGE_FILE) as csvfile:
-        spamreader = csv.reader(csvfile)
-        for row in spamreader:
-            messages.append(row[0])
-    for i in range(1, len(messages)):
-        api.update_status(messages[i])
-        print(messages[i])
-        time.sleep(60 * config.TIME_SLOT)
+    # Post the first message and deleted it from message file
+    # If no messsage left, send error
+    with open(config.MESSAGE_FILE, 'r') as readfile, open(config.TEMP_FILE, 'w') as writefile:
+        reader = csv.reader(readfile)
+        mlist = list(reader)
+        if len(mlist) > 1:
+            writer = csv.writer(writefile)
+            for i, row in enumerate(mlist):
+                if i == 1:
+                    api.update_status(row[0])
+                else:
+                    writer.writerow(row)
 
-    body = {
-        "message": "All handled",
-        "input": event
-    }
+            os.remove(config.MESSAGE_FILE)
+            os.rename(config.TEMP_FILE, config.MESSAGE_FILE)
 
-    response = {
-        "statusCode": 200,
-        "body": json.dumps(body)
-    }
+            body = {
+                "message": "twitter posted",
+                "input": event
+            }
+
+            response = {
+                "statusCode": 200,
+                "body": json.dumps(body)
+            }
+        else:
+            error = {
+                "message": "No message left, twitter post failed.",
+                "input": event
+            }
+
+            response = {
+                "statusCode": 400,
+                "error": json.dumps(error)
+            }
 
     return response
