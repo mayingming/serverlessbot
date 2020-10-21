@@ -1,5 +1,5 @@
 {
-  "name": "serverlessbot",
+  "name": "tbot",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -12,3 +12,4 @@
     "serverless-python-requirements": "^5.1.0"
   }
 }
+
