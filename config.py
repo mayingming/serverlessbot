@@ -7,3 +7,4 @@ TWITTER_NAME = "Your twitter user name"
 TIME_SLOT = 1
 MESSAGE_FILE = "test.csv"
 TEMP_FILE = "temp.csv"
+TEMP_FILE_TO_DELETE = "todelete.csv"
